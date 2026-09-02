@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "攻击思想.md",
+                "file": "破解Enigma机.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "攻击思想"
+              "title": "破解Enigma机"
             }
           }
         ]
@@ -99,7 +99,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "攻击思想.md",
+                "file": "破解Enigma机.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -118,7 +118,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "攻击思想.md",
+                "file": "破解Enigma机.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
@@ -161,7 +161,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "攻击思想.md",
+                "file": "破解Enigma机.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
@@ -199,20 +199,22 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "595a65f9631f0516",
+  "active": "b984fe0b84e5375a",
   "lastOpenFiles": [
+    "古典密码的安全性分析.md",
+    "计算安全.md",
+    "课程简介.md",
+    "基本假设.md",
+    "README.md",
+    "破解Enigma机.md",
+    "差分攻击.md",
     "对称加密算法.md",
     "攻击思想.md",
-    "基本假设.md",
-    "计算安全.md",
     "密码分析学概述.md",
-    "课程简介.md",
     "穷举攻击.md",
     "线性分析.md",
     "消息认证码.md",
     "杂凑函数.md",
-    "差分攻击.md",
-    "README.md",
     "未命名.base"
   ]
 }
