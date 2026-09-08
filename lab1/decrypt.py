@@ -1,5 +1,5 @@
 '''
-给定如下明密文数据流, 中的两个转子和反射器的定义不变, 尝试恢复密钥K1和K2。(结果可能不唯一)
+给定如下明密文数据流, 中的三个转子和反射器的定义不变, 尝试恢复密钥K1和K2。(结果可能不唯一)
 明文:  HELLOWORLD…
 密文: …WELLDONEEFGHIJ…
 
@@ -8,7 +8,7 @@
 例如[0,2,1,-1,...]表示A不接线(自身到自身), B与C相连, -1则表示字母D为自由(是否接线且与哪个字母接线未知)。
 
 
-扰频器组合(固定2个转子, 无需从5个中选择2个)
+扰频器组合(固定3个转子, 无需从5个中选择3个)
 快速转子QUICK = [0, 18, 24, 12, 10, 20, 8, 6, 14, 2, 11, 15, 22, 3, 25, 7, 17, 13, 5, 1, 23, 9, 16, 21, 19, 4]
 即快速转子的表格中左侧一列为0, 1, 2, …, 25, 右侧一列0, 18, 24, …, 4; 下同
 中速转子MID = [0, 10, 4, 2, 8, 1, 18, 20, 22, 19, 13, 6, 17, 5, 9, 3, 24, 14, 12, 25, 21, 11, 7, 16, 15, 23]
@@ -19,8 +19,38 @@ T = [10, 20, 14, 8, 25, 15, 16, 21, 3, 18, 0, 23, 13, 12, 2, 5, 6, 19, 9, 17, 1,
 '''
 
 import string
+from itertools import permutations
 
-crypt_once=lambda Q,M,st0,st1,m:chr((Q[(((M[((T[((M.index((((Q.index((ord(m)-ord("A")+st0)%26)-st0)%26)+st1)%26)-st1)%26)]+st1)%26)]-st1)%26+st0)%26)]-st0)%26+ord("A"))
+# 单次通过不含接线板的 Enigma 核心。
+# 当前调用中慢速转子位置通过关键字参数传入；未传入时 st2 默认取 0。
+_rotor_forward = lambda rotor, state, value: (rotor.index((value + state) % 26) - state) % 26
+_rotor_backward = lambda rotor, state, value: (rotor[(value + state) % 26] - state) % 26
+crypt_once = lambda Q, M, S, st0, st1, m, st2=0: chr(
+    _rotor_backward(
+        Q,
+        st0,
+        _rotor_backward(
+            M,
+            st1,
+            _rotor_backward(
+                S,
+                st2,
+                T[
+                    _rotor_forward(
+                        S,
+                        st2,
+                        _rotor_forward(
+                            M,
+                            st1,
+                            _rotor_forward(Q, st0, ord(m) - ord("A")),
+                        ),
+                    )
+                ],
+            ),
+        ),
+    )
+    + ord("A")
+)
 
 from copy import *
 
@@ -107,14 +137,18 @@ def dfs(graph,pos,st,path,locs): # 从左到右依次为构建的无向图, 输�
 
 
 
-QUICK = [0, 18, 24, 12, 10, 20, 8, 6, 14, 2, 11, 15, 22, 3, 25, 7, 17, 13, 5, 1, 23, 9, 16, 21, 19, 4]
+QUICK = [7, 19, 3, 22, 11, 25, 14, 1, 16, 23, 8, 20, 5, 17, 12, 9, 24, 6, 15, 2, 18, 21, 4, 13, 10, 0]
 MID = [0, 10, 4, 2, 8, 1, 18, 20, 22, 19, 13, 6, 17, 5, 9, 3, 24, 14, 12, 25, 21, 11, 7, 16, 15, 23]
-T = [10, 20, 14, 8, 25, 15, 16, 21, 3, 18, 0, 23, 13, 12, 2, 5, 6, 19, 9, 17, 1, 7, 24, 11, 22, 4]
+SLOW=[0, 23, 5, 12, 18, 3, 21, 9, 14, 1, 17, 6, 24, 11, 20, 4, 15, 8, 22, 7, 19, 13, 2, 16, 10, 25]
+T = [5, 3, 7, 1, 8, 0, 9, 2, 4, 6, 12, 14, 10, 15, 11, 13, 18, 20, 16, 21, 17, 19, 24, 25, 22, 23]
 
 
 if __name__=="__main__": 
-    m="HELLOWORLD"
-    c="WELLDONEEFGHIJ"
+    # m="HELLOWORLD"
+    # c="WELLDONEEFGHIJ"
+    # 使用实验数据的明密文
+    m='WETTERVORHERSAGEHEUTE'
+    c='EWGZDSATLWNEDBBCJUNGW'
     cribs=find_crib(c,m)
     print("总的crib数量: ", len(cribs))
     for crib in cribs:
@@ -133,86 +167,91 @@ if __name__=="__main__":
             ans|=set(ansi)        
         print("当前crib包含的所有环路有: ", ans)
         
-        guess_all_K2=set(sum([[(i,j) for i in range(26)] for j in range(26)],[])) # 从所有备选中进行筛选
-        guess={}
-        for case in ans:
-            guess_case={}
-            for i in range(26):
-                for j in range(26):
-                    for check in string.ascii_uppercase:
-                        trans=check
-                        path=[trans]
-                        for k in case[1]:
-                            trans=crypt_once(QUICK,MID,i-k,j,trans)
-                            path.append(trans)
-                        if trans==check:
-                            guess_case[(i,j)]=(path)
-                            break
-            guess_all_K2&=set(guess_case)
-            guess[case]=guess_case
-        print("通过环路猜测的K2密钥个数: ")    
-        print(len(guess_all_K2))      
-                      
-        guess_K2_K1={}                       
-        for guess_K2 in guess_all_K2:
-            K1={}
-            flag=True    
+        for i ,rotor_order in enumerate(permutations([QUICK,MID,SLOW])):
+            print(f"第{i+1}次尝试...")
+            Q,M,S=rotor_order
+            print("当前转子顺序为: ", rotor_order)
+            guess_all_K2={(i,j,k) for i in range(26) for j in range(26) for k in range(26)} # 从所有备选中进行筛选
+            guess={}
             for case in ans:
-                keychar=case[0]
-                for real,pluged in zip(case[0],guess[case][guess_K2]): # real是环路中被观测的值, pluged是过接线板后的值
-                    if real not in K1:
-                        K1[real]=pluged
-                    elif K1[real]!=pluged:
-                        flag=False
+                guess_case={}
+                for i in range(26):
+                    for j in range(26):
+                        for l in range(26):
+                            for check in string.ascii_uppercase:
+                                trans=check
+                                path=[trans]
+                                for k in case[1]:
+                                    trans=crypt_once(Q,M,S,i-k,j,trans,st2=l)
+                                    path.append(trans)
+                                if trans==check:
+                                    guess_case[(i,j,l)]=(path)
+                                    break
+                guess_all_K2&=set(guess_case)
+                guess[case]=guess_case
+            print("通过环路猜测的K2密钥个数: ")    
+            print(len(guess_all_K2))      
+                          
+            guess_K2_K1={}                       
+            for guess_K2 in guess_all_K2:
+                K1={}
+                flag=True    
+                for case in ans:
+                    keychar=case[0]
+                    for real,pluged in zip(case[0],guess[case][guess_K2]): # real是环路中被观测的值, pluged是过接线板后的值
+                        if real not in K1:
+                            K1[real]=pluged
+                        elif K1[real]!=pluged:
+                            flag=False
+                            break
+                        if pluged not in K1:
+                            K1[pluged]=real
+                        elif K1[pluged]!=real:
+                            flag=False
+                            break
+                    if flag==False:
                         break
-                    if pluged not in K1:
-                        K1[pluged]=real
-                    elif K1[pluged]!=real:
-                        flag=False
-                        break
-                if flag==False:
-                    break
-            if flag:
-                guess_K2_K1[guess_K2]=K1
-        print("通过环路及与环路相关的接线板设置无冲突, 猜测的K2密钥个数: ")    
-        print(len(guess_K2_K1))
-        
-        final_guess={}
-        for K2 in guess_K2_K1:
-            K1_now=deepcopy(guess_K2_K1[K2])
-            flag=True
-            ok=True
-            locs=set([i for i in range(len(m))])
-            while flag and ok:
-                flag=False
-                for loc,pair in enumerate(zip(crib,m)):
-                    known=set(pair)&set(K1_now)
-                    if len(known)>=1:
-                        locs-=set([loc])
-                    if len(known)==1:
-                        flag=True
-                        unknown_char=list(set(pair)-known)[0]
-                        known_char=list(known)[0]
-                        pluged_unknown_char=crypt_once(QUICK,MID,K2[0]-(loc%26),K2[1]-(loc//26),K1_now[known_char])
-                        if pluged_unknown_char not in K1_now:
-                            K1_now[pluged_unknown_char]=unknown_char
-                            K1_now[unknown_char]=pluged_unknown_char
-                        else :
-                            ok=False
-            if ok:
-                final_guess[K2]=(K1_now)
-        print("通过环路及所有可能的接线板无冲突, 猜测的K2密钥个数: ")
-        print(len(final_guess))    
-        print("其中接线板总数不超过6条的密钥为: ")
-        for guess in final_guess:
-            count=0
-            guess_K1=final_guess[guess]  
-            K1=[-1]*26      # -1代表现有信息无法支撑获取该位置的接线板情况
-            for i in guess_K1:
-                if guess_K1[i]!=i:         
-                    count+=1
-                K1[ord(i)-ord("A")]=ord(guess_K1[i])-ord("A")
-            if count/2>6:
-                continue
-            print(guess,K1,"接线板条数",count//2)
+                if flag:
+                    guess_K2_K1[guess_K2]=K1
+            print("通过环路及与环路相关的接线板设置无冲突, 猜测的K2密钥个数: ")    
+            print(len(guess_K2_K1))
+            
+            final_guess={}
+            for K2 in guess_K2_K1:
+                K1_now=deepcopy(guess_K2_K1[K2])
+                flag=True    
+                ok=True
+                locs=set([i for i in range(len(m))])
+                while flag and ok:
+                    flag=False
+                    for loc,pair in enumerate(zip(crib,m)):
+                        known=set(pair)&set(K1_now)
+                        if len(known)>=1:
+                            locs-=set([loc])
+                        if len(known)==1:
+                            flag=True
+                            unknown_char=list(set(pair)-known)[0]
+                            known_char=list(known)[0]
+                            pluged_unknown_char=crypt_once(Q,M,S,K2[0]-(loc%26),K2[1],K1_now[known_char],st2=K2[2])
+                            if pluged_unknown_char not in K1_now:
+                                K1_now[pluged_unknown_char]=unknown_char
+                                K1_now[unknown_char]=pluged_unknown_char
+                            else :
+                                ok=False
+                if ok:
+                    final_guess[K2]=(K1_now)
+            print("通过环路及所有可能的接线板无冲突, 猜测的K2密钥个数: ")
+            print(len(final_guess))    
+            print("其中接线板总数不超过6条的密钥为: ")
+            for guess in final_guess:
+                count=0
+                guess_K1=final_guess[guess]  
+                K1=[-1]*26      # -1代表现有信息无法支撑获取该位置的接线板情况
+                for i in guess_K1:
+                    if guess_K1[i]!=i:         
+                        count+=1
+                    K1[ord(i)-ord("A")]=ord(guess_K1[i])-ord("A")
+                if count/2>6:
+                    continue
+                print(rotor_order,guess,K1,"接线板条数",count//2)
                     

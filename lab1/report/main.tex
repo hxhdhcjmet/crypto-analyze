@@ -1,0 +1,124 @@
+\documentclass{CST_CryptoIntro}
+
+% ===== 封面配置 =====
+\reportCourse{密码分析学实验报告}
+\reportLogo{figures/logo_sduWithText.jpg}
+\reportName{张三、李四、王五}
+\reportID{202400460001、202400460002、202400460003}
+\reportMajor{密码科学与技术}
+
+% ===== 页眉配置 =====
+\headerLeft{密码分析学}
+\headerRight{第一次实验实验报告}
+
+\begin{document}
+
+% ===== 封面 =====
+\maketitle
+\thispagestyle{fancy}
+\newpage
+
+% ===== 目录 =====
+\tableofcontents
+\newpage
+
+% ================================================================
+% 正文内容
+% ================================================================
+\section{实验目的}
+
+本实验围绕 Enigma 密码机的结构、加密过程和密钥空间展开。通过编程实现给定参数下的 Enigma 加密，理解接线板、转子和反射器在密码变换中的作用；在此基础上分析转子排列、转子起始位置和接线板设置所形成的密钥空间，并结合实际加密速度判断直接穷举攻击的可行性。
+
+\subsection{组员分工}
+\begin{itemize}
+    \item 张三（202400460001）：Enigma 加密程序实现与任务一测试。
+    \item 李四（202400460002）：实验原理整理、密钥空间计算与任务三分析。
+    \item 王五（202400460003）：实验报告撰写、结果整理与格式校对。
+\end{itemize}
+% 实验环境
+\input{content/1environment}
+
+%实验原理
+\input{content/2principle}
+
+%实验内容
+
+\input{content/task1/1task.tex}
+
+\input{content/task3/task3.tex}
+
+
+\input{content/5appendix.tex}
+
+
+
+% \section{参考资料}
+% \begin{enumerate}
+%     \item 《密码分析学实验一》实验指导书。
+%     \item 课程课件《密码分析学概述》和《恩尼格玛密码机的破解》。
+%     \item 实验目录中的 Enigma 参考程序，并在报告任务一中对相应参考内容作出说明。
+% \end{enumerate}
+
+
+
+
+
+% \section{算法测试效率}
+
+% \subsection{正常使用测试}
+
+% 测试结果如下表所示:
+
+% \begin{table}[H]
+%     \centering
+%     \caption{正常流程各阶段性能数据}
+%     \begin{tabular}{@{}llcc@{}}
+%         \toprule
+%         阶段 & 描述 & 耗时 & 占比 \\
+%         \midrule
+%         Step 0   & 证书获取与连接       & $117.00$\,ms  & 99.5\% \\
+%         Phase 1--2 & 密钥协商          & $17.47$\,ms  & 74.6\% \\
+%         Phase 3   & 加密航班查询        & $3.44$\,ms   & 14.7\% \\
+%         \midrule
+%         \textbf{总计} & —              & $\mathbf{23.41}$\,\textbf{ms} & — \\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
+
+% \subsection{关键代码}
+
+% 代码示例 (\texttt{ca/certificate\_authority.py}):
+
+% \begin{lstlisting}[caption={ca/certificate\_authority.py — issue\_agent() \& verify\_certificate()}]
+% def issue_agent(self, agent_id, permissions):
+%     # 1. 生成 Agent 的 Ed25519 密钥对
+%     signing_private = generate_keypair()
+%     cert_body = {
+%         "agent_id": agent_id,
+%         "public_key": b64e(signing_private.public_bytes_raw()),
+%         "permissions": permissions,
+%     }
+%     # 2. CA 使用 Ed25519 私钥对证书体签名
+%     certificate = {
+%         "body": cert_body,
+%         "ca_signature": sign(self.private_key, cert_body),
+%     }
+%     return certificate
+
+% def verify_certificate(self, certificate):
+%     body = certificate["body"]
+%     # 验证 CA 签名
+%     verify(self.public_key, certificate["ca_signature"], body)
+%     return body["agent_id"]
+% \end{lstlisting}
+
+% \section{实验结果分析与总结}
+
+% 本实验完整覆盖了证书颁发、密钥协商、授权管理等全流程，协议在各层面均表现出有效的防护能力。
+
+% \appendix
+% \section{附录}
+
+% 项目完整代码地址: \url{https://github.com/example/crypto-intro.git}
+
+\end{document}
