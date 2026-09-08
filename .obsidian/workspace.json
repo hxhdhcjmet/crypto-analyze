@@ -185,7 +185,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 200,
+    "collapsed": true
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -199,8 +200,11 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "b984fe0b84e5375a",
+  "active": "595a65f9631f0516",
   "lastOpenFiles": [
+    "lab1/decrypt.py",
+    "lab1/encrypt.py",
+    "lab1",
     "古典密码的安全性分析.md",
     "计算安全.md",
     "课程简介.md",
