@@ -9,9 +9,9 @@
 
 
 扰频器组合(固定3个转子, 无需从5个中选择3个)
-快速转子QUICK = [0, 18, 24, 12, 10, 20, 8, 6, 14, 2, 11, 15, 22, 3, 25, 7, 17, 13, 5, 1, 23, 9, 16, 21, 19, 4]
+快速转子I = [0, 18, 24, 12, 10, 20, 8, 6, 14, 2, 11, 15, 22, 3, 25, 7, 17, 13, 5, 1, 23, 9, 16, 21, 19, 4]
 即快速转子的表格中左侧一列为0, 1, 2, …, 25, 右侧一列0, 18, 24, …, 4; 下同
-中速转子MID = [0, 10, 4, 2, 8, 1, 18, 20, 22, 19, 13, 6, 17, 5, 9, 3, 24, 14, 12, 25, 21, 11, 7, 16, 15, 23]
+中速转子II = [0, 10, 4, 2, 8, 1, 18, 20, 22, 19, 13, 6, 17, 5, 9, 3, 24, 14, 12, 25, 21, 11, 7, 16, 15, 23]
 
 反射器
 T = [10, 20, 14, 8, 25, 15, 16, 21, 3, 18, 0, 23, 13, 12, 2, 5, 6, 19, 9, 17, 1, 7, 24, 11, 22, 4]
@@ -20,14 +20,14 @@ T = [10, 20, 14, 8, 25, 15, 16, 21, 3, 18, 0, 23, 13, 12, 2, 5, 6, 19, 9, 17, 1,
 
 import string
 from copy import *
-def crypt_once(QUICK, MID, SLOW, T, st0, st1, st2, ch):
+def crypt_once(I, II, III, T, st0, st1, st2, ch):
     """
     在指定三个转子位置下，只加密一个字符。
     不经过接线板 K1，不自动转动转子。
     Args:
-        QUICK: 快速转子
-        MID:   中速转子
-        SLOW:  慢速转子
+        I: 快速转子
+        II:   中速转子
+        III:  慢速转子
         T:     反射器
         st0: 快速转子当前位置
         st1: 中速转子当前位置
@@ -42,7 +42,7 @@ def crypt_once(QUICK, MID, SLOW, T, st0, st1, st2, ch):
     # A -> 0, B -> 1, ...
     x = ord(ch) - ord('A')
 
-    rotors = [QUICK, MID, SLOW]
+    rotors = [I, II, III]
     positions = [st0, st1, st2]
     rotor_left = []
     rotor_right = []
@@ -146,12 +146,13 @@ def dfs(graph,pos,st,path,locs): # 从左到右依次为构建的无向图, 输�
             continue
         ans+=dfs(graph,i,st,path+[i],locs+[l])
     return ans
+def get_keys(d, value):
+    return [k for k,v in d.items() if v == value][0]
 
 
-
-QUICK = [7, 19, 3, 22, 11, 25, 14, 1, 16, 23, 8, 20, 5, 17, 12, 9, 24, 6, 15, 2, 18, 21, 4, 13, 10, 0]
-MID = [0, 10, 4, 2, 8, 1, 18, 20, 22, 19, 13, 6, 17, 5, 9, 3, 24, 14, 12, 25, 21, 11, 7, 16, 15, 23]
-SLOW = [0, 23, 5, 12, 18, 3, 21, 9, 14, 1, 17, 6, 24, 11, 20, 4, 15, 8, 22, 7, 19, 13, 2, 16, 10, 25]
+I = [7, 19, 3, 22, 11, 25, 14, 1, 16, 23, 8, 20, 5, 17, 12, 9, 24, 6, 15, 2, 18, 21, 4, 13, 10, 0]
+II = [0, 10, 4, 2, 8, 1, 18, 20, 22, 19, 13, 6, 17, 5, 9, 3, 24, 14, 12, 25, 21, 11, 7, 16, 15, 23]
+III = [0, 23, 5, 12, 18, 3, 21, 9, 14, 1, 17, 6, 24, 11, 20, 4, 15, 8, 22, 7, 19, 13, 2, 16, 10, 25]
 T = [5, 3, 7, 1, 8, 0, 9, 2, 4, 6, 12, 14, 10, 15, 11, 13, 18, 20, 16, 21, 17, 19, 24, 25, 22, 23]
 
 if __name__=="__main__": 
@@ -174,14 +175,16 @@ if __name__=="__main__":
                     visited[loc]=1    
             ans|=set(ansi)        
         print("当前crib包含的所有环路有: ", ans)
-        for QUICK, MID, SLOW in [(QUICK, MID, SLOW),
-                                 (QUICK, SLOW, MID),
-                                 (MID, QUICK, SLOW),
-                                 (MID, SLOW, QUICK),
-                                 (SLOW, QUICK, MID),
-                                 (SLOW, MID, QUICK)]:
-            print("当前扰频器组合为: ", (QUICK, MID, SLOW))
-            print("当前扰频器组合下的环路有: ", ans)
+        order = {'I':I,'II':II,'III':III}
+        num = 1
+        for I, II, III in [(I, II, III),
+                                 (I, III, II),
+                                 (II, I, III),
+                                 (II, III, I),
+                                 (III, I, II),
+                                 (III, II, I)]:
+            print(f"【{num}】当前扰频器组合为: ", get_keys(order,I), get_keys(order,II), get_keys(order,III))
+            num += 1
             guess_all_K2 = {(i, j, k) for i in range(26) for j in range(26) for k in range(26)} # 从所有备选中进行筛选
             guess={}
             for case in ans:
@@ -195,16 +198,15 @@ if __name__=="__main__":
                                 trans=check #注意这个check就是已经过了接线板的
                                 path=[trans]
                                 for z in case[1]:
-                                    trans=crypt_once(QUICK,MID,SLOW,T,(i-z)%26,j,k,trans)
+                                    trans=crypt_once(I,II,III,T,(i-z)%26,j,k,trans)
                                     path.append(trans) 
                                 if trans==check:
                                     paths.append(path)  
                             if len(paths)>0:
-                                guess_case[(i,j,k)]=paths #保存所有路径
+                                guess_case[(i,j,k)]=paths #保存所有路径，这个path就是[L0,L1,L2,...]
                 guess_all_K2&=set(guess_case) #每个环路会有一个guess_case,得到很多ijk，然后取交集
                 guess[case]=guess_case   #guess[case]是一个字典，guess[case][(i,j,k)]=path
-            print("通过环路猜测的K2密钥个数: ")    
-            print(len(guess_all_K2))      
+            print("通过环路猜测的K2密钥个数: ",len(guess_all_K2))    
                            
             #每个环都有很多路径，得有回溯搜索
             def merge_K1(K1, chars, path):
@@ -222,7 +224,7 @@ if __name__=="__main__":
                         new_K1[real] = pluged
                     # pluged -> real
                     if pluged in new_K1:
-                        if new_K1[pluged] != real:
+                        if new_K1[pluged] != real:  #矛盾的都排除
                             return None
                     else:
                         new_K1[pluged] = real
@@ -233,10 +235,10 @@ if __name__=="__main__":
                 # 所有环都处理完
                 if idx == len(cases):
                     return [K1]
-                case = cases[idx]
+                case = cases[idx] #这里case是形如(('T', 'G', 'T'), (19, 2))，这样的数据结构，case[0]就是环路
                 results = []
                 # 当前环可能有多个闭环 path
-                for path in guess[case][K2]:
+                for path in guess[case][K2]: #一个path对应可以找到一个K1的可能性
                     new_K1 = merge_K1(K1,case[0],path)
                     if new_K1 is not None:
                         results += search_K1(cases,guess,K2,idx + 1,new_K1)
@@ -247,8 +249,10 @@ if __name__=="__main__":
                 K1_candidates = search_K1(cases,guess,guess_K2)
                 if K1_candidates:
                     guess_K2_K1[guess_K2] = K1_candidates
-            print("通过环路及与环路相关的接线板设置无冲突, 猜测的K2密钥个数: ")    
-            print(len(guess_K2_K1))
+            if len(guess_K2_K1) == 0:
+                print("当前扰频器组合下没有可行的K2和K1\n")
+                continue
+            print("通过环路及与环路相关的接线板设置无冲突, 猜测的K2密钥个数: ",len(guess_K2_K1))    
               
             print("其中接线板总数不超过6条的密钥为: ")
             for guess in guess_K2_K1:
