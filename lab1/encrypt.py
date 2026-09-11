@@ -1,4 +1,6 @@
 from copy import *
+import random
+import time
 class myEnigma:
     def __init__(self, rotors, reflector) -> None:
         """
@@ -68,8 +70,32 @@ class myEnigma:
             m = K1[m]#过接线板
             self.updateRotor()#每加密一个字母, 更新转子
             ciphertext.append(chr(m + ord('A')))
-        return ''.join(ciphertext)                
-    
+        return ''.join(ciphertext)
+
+random.seed(202698) # 设置日期为种子
+
+def _generate_random_m(n=6):
+    # 生成随机明文供测试
+    # n表示明文长度，默认与测试明文长度相同
+    temp = []
+    for i in range(n):
+        temp.append(chr(random.randint(0,25) % 26 + ord('A')))
+    return ''.join(temp)
+
+def test_efficiency(S,QUICK,MID,SLOW,T,K2,n=1000):
+    # 进行n=1000次加密随机明文测试效率
+    E=myEnigma([QUICK, MID, SLOW], T)
+    E.setRotor(K2)
+    M = [_generate_random_m() for _ in range(n)]
+    print("开始测试Enigma加密效率...")
+    start = time.perf_counter()
+    for m in M:
+        c = E.encrypt(m,S)
+    end = time.perf_counter()
+    print(f"{n}次加密完成，总耗时:{end-start:.4f} s")
+    print(f"平均每秒加:{n/(end-start):.1f}条")
+
+
 if __name__=="__main__": 
     ## S = [AV BS CG MN OX]
     S = [21,18,6,3,4,5,2,7,8,9,10,11,13,12,23,15,16,17,1,19,20,0,22,14,24,25]
@@ -78,9 +104,11 @@ if __name__=="__main__":
     SLOW = [0, 23, 5, 12, 18, 3, 21, 9, 14, 1, 17, 6, 24, 11, 20, 4, 15, 8, 22, 7, 19, 13, 2, 16, 10, 25]
     T = [5, 3, 7, 1, 8, 0, 9, 2, 4, 6, 12, 14, 10, 15, 11, 13, 18, 20, 16, 21, 17, 19, 24, 25, 22, 23]
     K2 = [8,9,10]
-    E=myEnigma([QUICK, MID, SLOW], T)
-    E.setRotor(K2)
-    plaintext="WETTER"
-    ciphertext=E.encrypt(plaintext, S)
-    print(ciphertext)
+    # E=myEnigma([QUICK, MID, SLOW], T)
+    # E.setRotor(K2)
+    # plaintext="WETTER"
+    # ciphertext=E.encrypt(plaintext, S)
+    # print(ciphertext)
+    test_efficiency(S,QUICK,MID,SLOW,T,K2)
+
     

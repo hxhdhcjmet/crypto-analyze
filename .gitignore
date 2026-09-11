@@ -1,0 +1,33 @@
+# Python cache and local tooling
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# LaTeX generated files
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.log
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.xdv
+
+# Generated report output and temporary render files
+lab1/report/output/
+lab1/report/tmp/
+
+# Editor and operating-system temporary files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+~$*
