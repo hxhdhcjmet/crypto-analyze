@@ -14,8 +14,21 @@ Enigma 机主要由接线板、转子组和反射器组成。设接线板置换�
     C_i=S^{-1} \circ R_i^{-1} \circ T \circ R_i \circ S(P_i).
 \end{equation*}
 
-式中，$S^{-1}$ 表示接线板的逆置换，$R_i^{-1}$ 表示当前转子组的逆变换，$T$ 表示反射器。由于接线板由成对交换组成，所以 $S^{-1}=S$；反射器同样由成对连接组成，因此满足 $T^{-1}=T$。这也是 Enigma 能够使用相同结构完成解密的原因。
-同时反射器满足$T(\alpha) = \beta,\alpha \neq \beta$,即反射器的输入与输出必然不相等，这一特殊事件是后续对Enigma攻击的利用点。
+式中，$S^{-1}$ 表示接线板的逆置换，$R_i^{-1}$ 表示当前转子组的逆变换，$T$ 表示反射器。反射器满足$T(\alpha) = \beta,\alpha \neq \beta$,即反射器的输入与输出必然不相等。这导致了Enigma具有密文字母一定与明文字母不同的特点：
+令
+$$
+C = E(P) = S^{-1} \circ R^{-1} \circ T \circ R \circ S(P)
+$$
+假设存在$P = E(P)$，代入上式可得:
+$$
+P = S^{-1} \circ R^{-1} \circ T \circ R \circ S(P) \Rightarrow \\
+R \circ  S(P) = T \circ R \circ S(P)
+$$
+令$ R \circ S(P) = \gamma $，上式得到:
+$$
+\gamma = T(\gamma)
+$$
+这与反射器的定义相矛盾，因此假设不成立，不存在$P$使得$P = E(P)$，这一特殊事件是后续对Enigma机破解的一个利用点。
 
 \subsection{接线板}
 
